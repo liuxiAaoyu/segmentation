@@ -1,3 +1,14 @@
+events.*
+model.*
+graph.*
+checkpoint
+
+*.zip
+*.tfrecord
+*.csv
+*.jpeg
+*.jpg
+
 .pyc
 .py~
 
