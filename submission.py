@@ -49,8 +49,8 @@ for id in ids_test:
 
 ## https://www.kaggle.com/hackerpoet/even-faster-run-length-encoder
 def run_length_encode(img):
-    img = cv2.resize(img, (WIDTH_ORIG, HEIGHT_ORIG))
-    flat_img = img.flatten()
+    #img = cv2.resize(img, (WIDTH_ORIG, HEIGHT_ORIG))
+    flat_img = img#img.flatten()
     flat_img[0] = 0
     flat_img[-1] = 0
     flat_img = np.where(flat_img > 0.5, 1, 0).astype(np.uint8)
@@ -102,6 +102,8 @@ with slim.arg_scope(my_seg_net.my_arg_scpoe1()):
 im_softmax = tf.nn.softmax(logits)
 im_softmax = tf.reshape(im_softmax,shape=(image_shape[0], image_shape[1], 2))
 _, im_softmax = tf.split(im_softmax, [1, 1], axis=2)
+im_softmax = tf.image.resize_images(im_softmax, [1280, 1918])
+im_flatten = tf.reshape(im_softmax, [-1,1])
 
 # Restore model.
 #ckpt_filename = '/home/xiaoyu/logs/ssd_300_kitti./model.ckpt-226057'
@@ -191,7 +193,7 @@ def inferencelast():
     files.sort()
 
     i=100000
-    filenames = names[100000:]
+    filenames = names[:10]#names[100000:]
     rles = []
     for f in filenames:
         f = '/home/xiaoyu/Documents/segmentation/datasets/data/test/'+f

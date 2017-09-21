@@ -29,11 +29,22 @@ import train_utils
 slim = tf.contrib.slim
 
 tf.app.flags.DEFINE_string(
-    'master', '', 'The address of the TensorFlow master to use.')
+    'model_name', 'my_seg_net4', 'The name of the architecture to train.')
+
+tf.app.flags.DEFINE_integer(
+    'batch_size', 1, 'The number of samples in each batch.')
 
 tf.app.flags.DEFINE_string(
-    'train_dir', './log3_/',
+    'train_dir', './log4/',
     'Directory where checkpoints and event logs are written to.')
+
+#############################################################################
+tf.app.flags.DEFINE_string(
+    'master', '', 'The address of the TensorFlow master to use.')
+
+# tf.app.flags.DEFINE_string(
+#     'train_dir', './log3_/',
+#     'Directory where checkpoints and event logs are written to.')
 
 tf.app.flags.DEFINE_integer('num_clones', 1,
                             'Number of model clones to deploy.')
@@ -180,15 +191,15 @@ tf.app.flags.DEFINE_integer(
     'evaluate the VGG and ResNet architectures which do not use a background '
     'class for the ImageNet dataset.')
 
-tf.app.flags.DEFINE_string(
-    'model_name', 'my_seg_net3', 'The name of the architecture to train.')
+# tf.app.flags.DEFINE_string(
+#     'model_name', 'my_seg_net3', 'The name of the architecture to train.')
 
 tf.app.flags.DEFINE_string(
     'preprocessing_name', 'carvana', 'The name of the preprocessing to use. If left '
     'as `None`, then the model_name flag is used.')
 
-tf.app.flags.DEFINE_integer(
-    'batch_size', 1, 'The number of samples in each batch.')
+# tf.app.flags.DEFINE_integer(
+#     'batch_size', 1, 'The number of samples in each batch.')
 
 tf.app.flags.DEFINE_integer(
     'train_image_size', None, 'Train image size')

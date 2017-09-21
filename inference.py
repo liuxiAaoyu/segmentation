@@ -26,18 +26,19 @@ image_pre = carvana_preprocessing.preprocess_for_eval(img_input, image_shape[0],
 image_4d = tf.expand_dims(image_pre, 0)
 
 with slim.arg_scope(my_seg_net.my_arg_scpoe1()):
-    logits, _ = my_seg_net.my_seg_net3(image_4d,2)
+    logits, _ = my_seg_net.my_seg_net4(image_4d,2)
 
 im_softmax = tf.nn.softmax(logits)
 im_softmax = tf.reshape(im_softmax,shape=(image_shape[0], image_shape[1], 2))
 _, im_softmax = tf.split(im_softmax, [1, 1], axis=2)
+im_softmax = tf.image.resize_images(im_softmax, [1280, 1918])
 
 _tv=slim.get_variables()
 for i in _tv:
     print(i)
 # Restore model.
 #ckpt_filename = '/home/xiaoyu/logs/ssd_300_kitti./model.ckpt-226057'
-ckpt_filename = '/home/xiaoyu/Documents/segmentation/log3/model.ckpt-58404'
+ckpt_filename = '/home/xiaoyu/Documents/segmentation/log4/model.ckpt-94022'
 #ckpt_filename = '/home/xiaoyu/Documents/segmentation/log3_/model.ckpt-55328'#model.ckpt-58404'
 isess.run(tf.global_variables_initializer())
 saver = tf.train.Saver()
@@ -62,7 +63,7 @@ def process_image(sess, img):
 
     im = sess.run([im_softmax],{img_input: img})
     #im_softmax = im_softmax[0][:, 1].reshape(image_shape[0], image_shape[1])
-    segmentation = (im[0] > 0.5).reshape(image_shape[0], image_shape[1], 1)
+    segmentation = (im[0] > 0.5)#.reshape(image_shape[0], image_shape[1], 1)
     # mask = np.dot(segmentation, np.array([[0, 255, 0, 127]]))
     # mask = scipy.misc.toimage(mask, mode="RGBA")
     # street_im = scipy.misc.toimage(img)
