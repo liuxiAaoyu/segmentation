@@ -26,7 +26,7 @@ INPUT_SHAPE = (1918,1280)
 ## Tune it; used in generator
 batch_size = 1
 
-LAST_I = 100
+LAST_I = 0
 
 ## Mask properties
 WIDTH_ORIG = 1918
@@ -50,10 +50,11 @@ for id in ids_test:
 ## https://www.kaggle.com/hackerpoet/even-faster-run-length-encoder
 def run_length_encode(img):
     #img = cv2.resize(img, (WIDTH_ORIG, HEIGHT_ORIG))
-    flat_img = img#img.flatten()
+    #flat_img = img.flatten()
+    flat_img = img
     flat_img[0] = 0
     flat_img[-1] = 0
-    flat_img = np.where(flat_img > 0.5, 1, 0).astype(np.uint8)
+    flat_img = np.where(flat_img > 0.6, 1, 0).astype(np.uint8)
 
     starts = np.array((flat_img[:-1] == 0) & (flat_img[1:] == 1))
     ends = np.array((flat_img[:-1] == 1) & (flat_img[1:] == 0))
@@ -98,17 +99,17 @@ image_pre = carvana_preprocessing.preprocess_for_eval(img_input, image_shape[0],
 image_4d = tf.expand_dims(image_pre, 0)
 
 with slim.arg_scope(my_seg_net.my_arg_scpoe1()):
-    logits, _ = my_seg_net.my_seg_net3(image_4d,2)
+    logits, _ = my_seg_net.my_seg_net4(image_4d,2)
 im_softmax = tf.nn.softmax(logits)
 im_softmax = tf.reshape(im_softmax,shape=(image_shape[0], image_shape[1], 2))
 _, im_softmax = tf.split(im_softmax, [1, 1], axis=2)
 im_softmax = tf.image.resize_images(im_softmax, [1280, 1918])
-im_flatten = tf.reshape(im_softmax, [-1,1])
+im_flatten = tf.reshape(im_softmax, [-1])
 
 # Restore model.
 #ckpt_filename = '/home/xiaoyu/logs/ssd_300_kitti./model.ckpt-226057'
 #ckpt_filename = '/home/xiaoyu/Documents/segmentation/log/model.ckpt-15980'
-ckpt_filename = '/home/xiaoyu/Documents/segmentation/log3/model.ckpt-58404'
+ckpt_filename = '/home/xiaoyu/Documents/segmentation/log4/model.ckpt-101081'
 isess.run(tf.global_variables_initializer())
 saver = tf.train.Saver()
 saver.restore(isess, ckpt_filename)
@@ -119,8 +120,8 @@ saver.restore(isess, ckpt_filename)
 # Main image processing routine.
 def process_image(sess, img):
 
-    scoreimg = sess.run([im_softmax],{img_input: img})
-    scoreimg = scoreimg[0]
+    flatten = sess.run(im_flatten,{img_input: img})
+    #scoreimg = scoreimg[0]
     #segmentation = (scoreimg > MASK_THRESHOLD).reshape(image_shape[0], image_shape[1], 1)
 
     #mask = np.dot(segmentation, np.array([[ 0, 255, 0]]))
@@ -132,7 +133,7 @@ def process_image(sess, img):
     # cv2.imshow('image', out)#cv2.pyrDown(out))
     # cv2.waitKey(1)
     #mask = im_softmax.reshape(image_shape[0], image_shape[1], 1)
-    return scoreimg
+    return flatten
 # Main image processing routine.
 
 def process_image2(sess, img):
@@ -193,7 +194,7 @@ def inferencelast():
     files.sort()
 
     i=100000
-    filenames = names[:10]#names[100000:]
+    filenames = names[100000:]
     rles = []
     for f in filenames:
         f = '/home/xiaoyu/Documents/segmentation/datasets/data/test/'+f

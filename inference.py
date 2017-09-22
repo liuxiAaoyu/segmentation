@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import glob
 import cv2
+import matplotlib.pyplot as plt
 
 slim = tf.contrib.slim
 
@@ -32,13 +33,13 @@ im_softmax = tf.nn.softmax(logits)
 im_softmax = tf.reshape(im_softmax,shape=(image_shape[0], image_shape[1], 2))
 _, im_softmax = tf.split(im_softmax, [1, 1], axis=2)
 im_softmax = tf.image.resize_images(im_softmax, [1280, 1918])
-
+#im_softmax = tf.expand_dims(im_softmax, -1)
 _tv=slim.get_variables()
 for i in _tv:
     print(i)
 # Restore model.
 #ckpt_filename = '/home/xiaoyu/logs/ssd_300_kitti./model.ckpt-226057'
-ckpt_filename = '/home/xiaoyu/Documents/segmentation/log4/model.ckpt-94022'
+ckpt_filename = '/home/xiaoyu/Documents/segmentation/log4/model.ckpt-101081'
 #ckpt_filename = '/home/xiaoyu/Documents/segmentation/log3_/model.ckpt-55328'#model.ckpt-58404'
 isess.run(tf.global_variables_initializer())
 saver = tf.train.Saver()
@@ -63,21 +64,21 @@ def process_image(sess, img):
 
     im = sess.run([im_softmax],{img_input: img})
     #im_softmax = im_softmax[0][:, 1].reshape(image_shape[0], image_shape[1])
+    #plt.imshow(im[0][:,:,0])
+    #plt.show()
     segmentation = (im[0] > 0.5)#.reshape(image_shape[0], image_shape[1], 1)
-    # mask = np.dot(segmentation, np.array([[0, 255, 0, 127]]))
-    # mask = scipy.misc.toimage(mask, mode="RGBA")
-    # street_im = scipy.misc.toimage(img)
-    # street_im.paste(mask, box=None, mask=mask)
+
+
     mask = np.dot(segmentation, np.array([[ 0, 255, 0]]))
     mask = np.asarray(mask,dtype=np.uint8)
-    myimg = cv2.resize(img,(image_shape[1],image_shape[0]))
-    #result = 
+    myimg = img#cv2.resize(img,(image_shape[1],image_shape[0]))
+
     result = cv2.addWeighted(myimg, 1, mask, 1, 0)
     out=np.dstack((result[:,:,2],result[:,:,1],result[:,:,0]))
-    cv2.imshow('image', out)#cv2.pyrDown(out))
+    cv2.imshow('image',cv2.pyrDown(out))
     cv2.waitKey(0)
 
-    return 
+    return segmentation
 
 
 def inference():

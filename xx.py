@@ -32,7 +32,7 @@ tf.app.flags.DEFINE_string(
     'model_name', 'my_seg_net4', 'The name of the architecture to train.')
 
 tf.app.flags.DEFINE_integer(
-    'batch_size', 1, 'The number of samples in each batch.')
+    'batch_size', 2, 'The number of samples in each batch.')
 
 tf.app.flags.DEFINE_string(
     'train_dir', './log4/',
